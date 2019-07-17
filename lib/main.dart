@@ -29,6 +29,10 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> {
   static const _channel = MethodChannel('sample/toPlatformScreen');
 
+  String startTimePlatformScreen = "";
+
+  String endTimePlatformScreen = "";
+
   _toPlatformScreen() async {
     try {
       var result = await _channel.invokeMethod(
@@ -36,6 +40,9 @@ class _MyHomePageState extends State<MyHomePage> {
         <String, dynamic>{"label_from_dart": "Label From Dart"},
       );
       print(result);
+      setState(() {
+        startTimePlatformScreen = '${DateTime.now().toIso8601String()} $result';
+      });
     } on PlatformException catch (e) {
       print(e);
     }
@@ -49,7 +56,11 @@ class _MyHomePageState extends State<MyHomePage> {
       switch (call.method) {
         case "onClosed":
           var map = call.arguments.cast<String, String>();
-          print(map["from_platform"]);
+          var callbackMessage = map["from_platform"];
+          print(callbackMessage);
+          setState(() {
+            endTimePlatformScreen = '${DateTime.now().toIso8601String()} $callbackMessage';
+          });
           break;
       }
       return;
@@ -67,9 +78,16 @@ class _MyHomePageState extends State<MyHomePage> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
             Text(
-              'aaaaa',
-              style: Theme.of(context).textTheme.display1,
+              "Platform screen start time",
+              style: Theme.of(context).textTheme.title,
             ),
+            Text(startTimePlatformScreen),
+            const SizedBox(height: 100),
+            Text(
+              "Platform screen end time",
+              style: Theme.of(context).textTheme.title,
+            ),
+            Text(endTimePlatformScreen),
           ],
         ),
       ),
